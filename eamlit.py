@@ -2,7 +2,16 @@ import pandas as pd  # pip install pandas openpyxl
 import streamlit as st  # pip install streamlit
 
 
-df = pd.read_excel("SteelFab.xlsx", header=0,sheet_name="Sheet1")
+@st.cache
+def get_data_from_excel():
+    df = pd.read_excel(
+        io="SteelFab.xlsx",
+        engine="openpyxl",
+        sheet_name="Sheet1",
+        header=0,
+    )
+    # Add 'hour' column to dataframe
+    return df
 
 st.title('RHI - A1 Package - Updated Marks Data Visualiation ')
 
@@ -13,9 +22,10 @@ This application has been prepared to observe the current mark and KMD statuses 
 st.sidebar.header('User Input Features')
 selected_mark = st.sidebar.text_input("Mark Number for Search")
 
-
-df2 = df[df['MARK NUMBER'] == selected_mark]
-
 #"P.2P1.DA-124/1"
+
+df = get_data_from_excel()
+
+df2 = df[df['MARK NUMBER']] == selected_mark
 
 st.markdown(st.write(df2))
