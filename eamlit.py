@@ -1,31 +1,44 @@
-import pandas as pd  # pip install pandas openpyxl
-import streamlit as st  # pip install streamlit
+import streamlit as st 
+import pandas as pd
+
+# DB Mgmt
+import sqlite3 
+conn = sqlite3.connect('trial.db')
+c = conn.cursor()
 
 
-@st.cache
-def get_data_from_excel():
-    df = pd.read_excel(
-        io="SteelFab.xlsx",
-        engine="openpyxl",
-        sheet_name="Sheet1",
-        header=0,
-    )
-    # Add 'hour' column to dataframe
-    return df
+# Fxn Make Execution
+def sql_executor(raw_code):
+	c.execute(raw_code)
+	data = c.fetchall()
+	return data 
 
-st.title('RHI - A1 Package - Updated Marks Data Visualiation ')
 
-st.markdown("""
-This application has been prepared to observe the current mark and KMD statuses with the data in the database.
- """)
 
-st.sidebar.header('User Input Features')
-selected_mark = st.sidebar.text_input("Mark Number for Search")
 
-#"P.2P1.DA-124/1"
+def main():
+	st.title("SQLPlayground")
 
-df = get_data_from_excel()
 
-df2 = df[df['MARK NUMBER']] == selected_mark
+st.subheader("HomePage")
 
-st.markdown(st.write(df2))
+
+st.form(key='query_form')
+raw_code = st.text_area("SQL Code Here")
+
+
+st.code(raw_code)
+
+query_results = sql_executor(raw_code)
+
+
+st.expander("Pretty Table")
+query_df = pd.DataFrame(query_results)
+st.dataframe(query_df)
+
+
+
+
+
+if __name__ == '__main__':
+	main()
